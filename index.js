@@ -17,7 +17,7 @@ const client = new line.Client(lineConfig);
 app.post('/webhook', line.middleware(lineConfig),async(req,res)=>{
     try {
         const events = req.body.events;
-        console.log('event1',events);
+        console.log('event',events);
         return events.length > 0 ? await events.map(item => handleEvent(item)) : res.status(200).send('OK')
     } catch (error) {
         res.status(500).end()        
@@ -28,10 +28,11 @@ const handleEvent = async (event) => {
     if(event.type === 'message' && event.message.type === 'text'){
 
         const textInput = event.message.text
-        const textLot = textInput.trim().split(' ');
+        let textLot = textInput.trim().split(' ');
         console.log('textLot',textLot)
-        // textLot.forEach(async text => {
-        const allReply = textLot.map(async text => {
+        textLot = [textLot[0]]
+        // const allReply = textLot.map(async text => {
+        textLot.forEach(async text => {
             try {
                 const {data} = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${text}`)
 
@@ -57,9 +58,9 @@ const handleEvent = async (event) => {
         
                     replyMessage += pos + ': ' + def + '\n'
                 });
-                
-                // return client.replyMessage(event.replyToken, {type:'text', text:replyMessage})
-                return replyMessage
+                // return replyMessage
+                return client.replyMessage(event.replyToken, {type:'text', text:replyMessage});
+                // await client.replyMessage(event.replyToken, {type:'text', text:replyMessage});
                 
             } catch (error) {
                 console.error('Error',error)
@@ -67,21 +68,24 @@ const handleEvent = async (event) => {
             }
         });
 
-        Promise.all(allReply)
-        .then(replyMessages => {
-            console.error('----- SSSSS -----', replyMessages);
-            replyMessages.forEach(async replyMessage => {
-                try {
-                    console.error('----- replyMessage -----', replyMessage);
-                    return client.replyMessage(event.replyToken, {type:'text', text:replyMessage});
-                } catch (error) {
-                    console.error('Error', error);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error in Promise.all', error);
-        });
+        // Promise.all(allReply)
+        // .then(replyMessages => {
+        //     replyMessages.forEach(async replyMessage => {
+        //         try {
+        //             // await client.replyMessage(event.replyToken, {type:'text', text:replyMessage}); //WHY??
+        //             setTimeout(() => {
+        //                 console.error('----- replyMessage -----', replyMessage);
+        //                 return client.replyMessage(event.replyToken, {type:'text', text:replyMessage});
+        //             }, replyMessages.length * 1000)
+
+        //         } catch (error) {
+        //             console.error('Error', error);
+        //         }
+        //     });
+        // })
+        // .catch(error => {
+        //     console.error('Error in Promise.all', error);
+        // });
             
     }
     
