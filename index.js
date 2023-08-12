@@ -27,8 +27,64 @@ app.post('/webhook', line.middleware(lineConfig),async(req,res)=>{
 const handleEvent = async (event) => {
     if(event.type === 'message' && event.message.type === 'text'){
 
+        const textInput = event.message.text
+        const textLot = textInput.trim().split(' ');
+        console.log('textLot',textLot)
+        // textLot.forEach(async text => {
+        const allReply = textLot.map(async text => {
+            try {
+                const {data} = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${text}`)
+
+                let replyMessage = ''
+                
+                const word = data[0].word
+                const word2 = word.charAt(0).toUpperCase() + word.slice(1);
+        
+                replyMessage += word2 + '\n' + '\n'
+                
+                data[0].meanings.forEach(meaning => {
+        
+                    const partOfSpeech = meaning.partOfSpeech
+                    const definitions = meaning.definitions
+                    const definition = definitions[0].definition
+                    
+                    // definitions.forEach(definition => {
+                    //     // console.log('- ',definition.definition)
+                    // });
+        
+                    const pos = partOfSpeech.charAt(0).toUpperCase() + partOfSpeech.slice(1);
+                    const def = definition.charAt(0).toUpperCase() + definition.slice(1);
+        
+                    replyMessage += pos + ': ' + def + '\n'
+                });
+                
+                // return client.replyMessage(event.replyToken, {type:'text', text:replyMessage})
+                return replyMessage
+                
+            } catch (error) {
+                console.error('Error',error)
+                return
+            }
+        });
+
+        Promise.all(allReply)
+        .then(replyMessages => {
+            console.error('----- SSSSS -----', replyMessages);
+            replyMessages.forEach(async replyMessage => {
+                try {
+                    console.error('----- replyMessage -----', replyMessage);
+                    return client.replyMessage(event.replyToken, {type:'text', text:replyMessage});
+                } catch (error) {
+                    console.error('Error', error);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error in Promise.all', error);
+        });
+            
     }
-    return client.replyMessage(event.replyToken,{type:'text', text:'Test'})
+    
 }
 
 app.listen(port, () => {
