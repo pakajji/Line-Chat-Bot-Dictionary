@@ -101,4 +101,8 @@ app.listen(port, () => {
     console.log('listening on port ',port)
 })
 
+app.use((err, req, res, next) => {
+    res.status(500).send({ message: err.message, errorName: err.name });
+});
+
 module.exports = app
