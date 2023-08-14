@@ -105,4 +105,4 @@ app.use((err, req, res, next) => {
     res.status(500).send({ message: err.message, errorName: err.name });
 });
 
-module.exports = app
+// module.exports = app
