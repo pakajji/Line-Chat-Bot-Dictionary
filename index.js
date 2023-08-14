@@ -14,6 +14,10 @@ const lineConfig = {
 
 const client = new line.Client(lineConfig);
 
+app.get('/', (req, res) => {
+    res.send('Call API')
+})
+
 app.post('/webhook', line.middleware(lineConfig),async(req,res)=>{
     try {
         const events = req.body.events;
@@ -94,3 +98,5 @@ const handleEvent = async (event) => {
 app.listen(port, () => {
     console.log('listening on port ',port)
 })
+
+module.exports = app
