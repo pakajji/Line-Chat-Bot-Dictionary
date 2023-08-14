@@ -5,13 +5,16 @@ const dotenv = require('dotenv')
 
 const env = dotenv.config().parsed
 const app = express()
-const port = env.PORT
+// const port = env.PORT
+const port = process.env.PORT
 
 // app.use(express.json());
 
 const lineConfig = {
-    channelAccessToken: env.ACCESS_TOKEN,
-    channelSecret: env.SECRET_TOKEN
+    // channelAccessToken: env.ACCESS_TOKEN,
+    // channelSecret: env.SECRET_TOKEN
+    channelAccessToken: process.env.ACCESS_TOKEN,
+    channelSecret: process.env.SECRET_TOKEN
 }
 
 const client = new line.Client(lineConfig);
