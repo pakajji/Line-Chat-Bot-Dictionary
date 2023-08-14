@@ -7,6 +7,8 @@ const env = dotenv.config().parsed
 const app = express()
 const port = env.PORT
 
+app.use(express.json());
+
 const lineConfig = {
     channelAccessToken: env.ACCESS_TOKEN,
     channelSecret: env.SECRET_TOKEN
